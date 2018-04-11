@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qingguatang.product.dao.CategoryDAO">
+  <resultMap id="BaseResultMap" type="com.qingguatang.product.dataobject.CategoryDO">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="gmt_created" jdbcType="TIMESTAMP" property="gmtCreated" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="media_id" jdbcType="VARCHAR" property="mediaId" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="parent_category_id" jdbcType="VARCHAR" property="parentCategoryId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from category
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.qingguatang.product.dataobject.CategoryDO">
+    insert into category (id, gmt_created, gmt_modified, 
+      name, media_id, status, 
+      sort, parent_category_id)
+    values (#{id,jdbcType=BIGINT}, #{gmtCreated,jdbcType=TIMESTAMP}, #{gmtModified,jdbcType=TIMESTAMP}, 
+      #{name,jdbcType=VARCHAR}, #{mediaId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, 
+      #{sort,jdbcType=INTEGER}, #{parentCategoryId,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.qingguatang.product.dataobject.CategoryDO">
+    update category
+    set gmt_created = #{gmtCreated,jdbcType=TIMESTAMP},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      name = #{name,jdbcType=VARCHAR},
+      media_id = #{mediaId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      parent_category_id = #{parentCategoryId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="com.qingguatang.product.dataobject.CategoryDO" resultMap="BaseResultMap">
+    select id, gmt_created, gmt_modified, name, media_id, status, sort, parent_category_id
+    from category
+    <where>
+      <if test="id ！= null and id != ''">
+        AND id = #{id,jdbcType=BIGINT}
+      </if>
+      <if test="name ！= null and name != ''">
+        AND name = #{name,jdbcType=VARCHAR}
+      </if>
+    </where>
+
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, gmt_created, gmt_modified, name, media_id, status, sort, parent_category_id
+    from category
+  </select>
+  <select id="querySortInFather" parameterType="com.qingguatang.product.dataobject.CategoryDO" resultType="Integer">
+    select ifnull(max(sort),0) from category where id = #{parentCategoryId,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteFatherAndChild" parameterType="com.qingguatang.product.dataobject.CategoryDO">
+    delete a,b from category a,category b where a.id = b.parent_category_id and a.id = #{id,jdbcType=BIGINT}
+  </delete>
+</mapper>
